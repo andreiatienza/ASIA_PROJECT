@@ -3,7 +3,8 @@ SDG Dashboard Analytics
 
 Overview
 --------
-The SDG Dashboard Analytics is a web-based tool designed to visualize and analyze data related to the United Nations Sustainable Development Goals (SDGs) across multiple campuses and projects. It provides interactive charts, summary cards, and detailed tables to help users monitor progress, compare performance, and identify trends in SDG-related initiatives.
+The Sustainability Assessment Tool is a web-based platform developed for Batangas State University (BSU) to evaluate, monitor, and promote sustainable development efforts aligned with the United Nations Sustainable Development Goals (SDGs). This tool offers interactive data visualizations, comprehensive summary cards, and detailed reports to assess the sustainability performance of various campuses and projects within BSU.
+Users can explore progress across key sustainability indicators, identify areas needing improvement, and support data-driven decision-making to enhance BSU’s commitment to sustainable growth and social responsibility. By fostering transparency and collaboration, this tool empowers stakeholders—students, faculty, and administrators—to actively contribute toward achieving the SDGs in the university community.
 
 Dataset Used
 ------------
