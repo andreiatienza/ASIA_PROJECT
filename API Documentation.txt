@@ -1,0 +1,92 @@
+API Documentation
+==================
+
+Project Overview
+----------------
+The SDG Dashboard Analytics is a web-based tool designed to visualize and analyze data related to the United Nations Sustainable Development Goals (SDGs) across multiple campuses and projects. It provides interactive charts, summary cards, and detailed tables to help users monitor progress, compare performance, and identify trends in SDG-related initiatives.
+
+Key Features:
+- Summary Cards: Quick stats on total SDGs, projects, points, and active campuses.
+- Interactive Charts: Line, bar, pie, and radar charts for trends, campus comparison, SDG distribution, and research analysis.
+- Project Details Table: Searchable and filterable table of all SDG-related projects.
+- Modern UI: Responsive, visually appealing design with maroon/pink theme.
+
+API Route List & Sample Responses
+---------------------------------
+
+1. Get all SDGs
+   GET /api/sdg
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "sdg_ID": 1, "sdg_name": "No Poverty", "description": "End poverty in all its forms everywhere" },
+       ...
+     ]
+   }
+
+2. Get SDG Performance Trends (Line Chart)
+   GET /api/sdg/trends
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "created_year": 2022, "total_points": 1234.56, "sdg_count": 17, "participation_count": 81 },
+       ...
+     ]
+   }
+
+3. Get Campus Comparison (Bar Chart)
+   GET /api/sdg/campus-stats
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "campus": "LIPA", "sdg_name": "No Poverty", "total_points": 123.45, "participation_count": 10, "total_policy_research": 2 },
+       ...
+     ]
+   }
+
+4. Get SDG Distribution (Pie/Donut Chart)
+   GET /api/sdg/distribution
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "sdg_name": "No Poverty", "participation_count": 10, "total_points": 123.45, "project_count": 5 },
+       ...
+     ]
+   }
+
+5. Get Project Details (Table)
+   GET /api/sdg/project-details
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "title_ppa": "Sustainable Agriculture Plan", "description": "Description for Waste Management Initiative", "total_cost": 48558, "fund_source": "Private", "campus": "Alangilan", "sdg_name": "No Poverty", "total_points": 67.38, "policy_research_count": 1, "created_year": 2024 },
+       ...
+     ]
+   }
+
+6. Get Yearly Progress
+   GET /api/sdg/yearly-progress
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "created_year": 2024, "total_participations": 81, "total_points": 4440.55, "total_projects": 81, "active_campuses": 7, "total_policy_research": 12 },
+       ...
+     ]
+   }
+
+7. Get Policy Research Analysis (Radar Chart)
+   GET /api/sdg/policy-research
+   Response:
+   {
+     "status": "success",
+     "data": [
+       { "sdg_name": "No Poverty", "total_policy_research": 2, "participation_count": 10, "avg_points": 67.38 },
+       ...
+     ]
+   } 

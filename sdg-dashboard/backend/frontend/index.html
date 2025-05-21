@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SDG Dashboard Analytics</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .chart-container {
+      position: relative;
+      margin: auto;
+      height: 300px;
+      margin-bottom: 30px;
+    }
+    .dashboard-title {
+      text-align: center;
+      margin: 20px 0;
+      color: #800000;
+    }
+    .card {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+      background: none;
+    }
+    .table thead th {
+      background: #fdeaea !important;
+      color: #800000 !important;
+      font-weight: 700;
+      border-bottom: 2px solid #f8d7da !important;
+      font-size: 1.08rem;
+      letter-spacing: 0.01em;
+    }
+    .table-striped > tbody > tr:nth-of-type(odd) {
+      background-color: #fdeaea !important;
+      box-shadow: none !important;
+    }
+    .table-striped > tbody > tr:nth-of-type(even) {
+      background-color: #fff !important;
+    }
+    .table-striped > tbody > tr:hover {
+      background-color: #f8d7da;
+    }
+    .summary-card {
+      background: #fff5f5;
+      color: #800000;
+      padding: 24px 20px 20px 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px 0 rgba(128,0,0,0.08);
+      border: 1px solid #f8d7da;
+    }
+    .summary-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #800000;
+    }
+    .summary-card p {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #800000;
+    }
+    .analytics-section-card {
+      background: #fff5f5;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px 0 rgba(128,0,0,0.08);
+      border: 1px solid #f8d7da;
+      margin-bottom: 32px;
+      padding: 0;
+    }
+    .analytics-section-header {
+      background: #fdeaea;
+      border-radius: 16px 16px 0 0;
+      padding: 18px 24px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #800000;
+      border-bottom: 1px solid #f8d7da;
+    }
+    .analytics-section-body {
+      padding: 24px;
+    }
+    .table-container table {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #f8d7da;
+      box-shadow: 0 2px 12px 0 rgba(128,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      <!-- Sidebar -->
+      <button class="btn btn-outline-light d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list"></i>
+      </button>
+      <nav id="sidebarMenu" class="collapse d-md-flex flex-column align-items-center sidebar py-4">
+        <img src="img/sat-logo.png" alt="Logo" class="sidebar-logo mb-3">
+        <h5 class="sidebar-title mb-4 text-center">SUSTAINABILITY ASSESSMENT TOOL</h5>
+        <div class="sidebar-date mb-1 text-center" id="sidebar-date"></div>
+        <div class="sidebar-location mb-4 text-center">LIPA CAMPUS</div>
+        <ul class="nav flex-column w-100">
+          <li class="nav-item mb-2">
+            <a class="nav-link active" href="#"><span class="icon"><i class="bi bi-bar-chart-fill"></i></span> Dashboard</a>
+          </li>
+        </ul>
+      </nav>
+      <!-- Analytics Navbar and Main Content -->
+      <div class="col-12 col-md-9 col-lg-10 analytics-main px-0">
+        <!-- Fixed Analytics Navbar -->
+        <nav class="navbar analytics-navbar fixed-analytics-navbar">
+          <span class="navbar-brand mb-0 h1">Sustainability Assessment Tool</span>
+        </nav>
+        <main class="p-4 analytics-bg">
+          <div class="container">
+            <h1 class="dashboard-title">SDG Dashboard Analytics</h1>
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+              <div class="col-md-3">
+                <div class="summary-card">
+                  <h3>Total SDGs</h3>
+                  <p id="total-sdgs">-</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="summary-card">
+                  <h3>Total Projects</h3>
+                  <p id="total-projects">-</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="summary-card">
+                  <h3>Total Points</h3>
+                  <p id="total-points">-</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="summary-card">
+                  <h3>Active Campuses</h3>
+                  <p id="active-campuses">-</p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <!-- Line Chart - Trends -->
+              <div class="col-md-6">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">Overall SDG Points Trends</div>
+                  <div class="analytics-section-body">
+                    <p class="text-muted">Shows total points earned across all SDGs per year</p>
+                    <div class="chart-container">
+                      <canvas id="trendsChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bar Chart - Campus Comparison -->
+              <div class="col-md-6">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">Campus Points Comparison</div>
+                  <div class="analytics-section-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <div class="fw-bold" style="font-size:1.1rem; color:#800000;">Campus Points Comparison</div>
+                      <div class="campus-selector">
+                        <select id="campusViewSelect" class="form-select">
+                          <option value="all">All</option>
+                          <option value="individual">SDG Performance</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div id="campusSelectorContainer" class="mb-3" style="display: none;">
+                      <div class="row">
+                        <div class="col-md-8">
+                          <select id="campusSelect" class="form-select">
+                            <!-- Will be populated dynamically -->
+                          </select>
+                        </div>
+                        <div class="col-md-4">
+                          <button id="resetCampusView" class="btn btn-outline-secondary w-100">
+                            Reset View
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text-muted" id="chartDescription">Shows average points earned by each campus</p>
+                    <div class="chart-container">
+                      <canvas id="campusChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <!-- Pie Chart - SDG Distribution -->
+              <div class="col-md-6">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">SDG Points Share</div>
+                  <div class="analytics-section-body">
+                    <p class="text-muted">Shows how points are distributed across different SDGs</p>
+                    <div class="chart-container">
+                      <canvas id="distributionChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Radar Chart - Project Analysis -->
+              <div class="col-md-6">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">SDG Performance Overview</div>
+                  <div class="analytics-section-body">
+                    <p class="text-muted">Shows how each SDG performs in terms of points and research</p>
+                    <div class="chart-container">
+                      <canvas id="radarChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Yearly Progress -->
+            <div class="row">
+              <div class="col-12">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">Yearly Progress</div>
+                  <div class="analytics-section-body">
+                    <div class="chart-container">
+                      <canvas id="yearlyProgressChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Project Details Table -->
+            <div class="row">
+              <div class="col-12">
+                <div class="analytics-section-card">
+                  <div class="analytics-section-header">Project Details</div>
+                  <div class="analytics-section-body">
+                    <!-- Search and Filter Controls -->
+                    <div class="row mb-3">
+                      <div class="col-md-4 mb-2 mb-md-0">
+                        <input type="text" id="projectSearch" class="form-control" placeholder="Search projects...">
+                      </div>
+                      <div class="col-md-4 mb-2 mb-md-0">
+                        <select id="campusFilter" class="form-select">
+                          <option value="">All Campuses</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select id="sdgFilter" class="form-select">
+                          <option value="">All SDGs</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="table-container">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Total Cost</th>
+                            <th>Fund Source</th>
+                            <th>Campus</th>
+                            <th>SDG</th>
+                            <th>Points</th>
+                            <th>Year</th>
+                          </tr>
+                        </thead>
+                        <tbody id="projectDetailsTable">
+                          <!-- Data will be populated here -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Set date/time
+    function updateSidebarDate() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateStr = now.toLocaleDateString(undefined, options);
+      const timeStr = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('sidebar-date').textContent = `${dateStr} at ${timeStr}`;
+    }
+    updateSidebarDate();
+    setInterval(updateSidebarDate, 1000);
+
+    // Function to fetch data from API
+    async function fetchData(endpoint) {
+      try {
+        console.log(`Fetching data from /api/sdg/${endpoint}`);
+        const response = await fetch(`/api/sdg/${endpoint}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log(`Data received from ${endpoint}:`, result);
+        return result.data;
+      } catch (error) {
+        console.error(`Error fetching ${endpoint}:`, error);
+        return [];
+      }
+    }
+
+    // Update Summary Cards
+    async function updateSummaryCards() {
+      const sdgs = await fetchData('');
+      const yearlyProgress = await fetchData('yearly-progress');
+      const latestYear = yearlyProgress[yearlyProgress.length - 1];
+
+      document.getElementById('total-sdgs').textContent = sdgs.length;
+      document.getElementById('total-projects').textContent = latestYear?.total_projects || 0;
+      document.getElementById('total-points').textContent = latestYear?.total_points || 0;
+      document.getElementById('active-campuses').textContent = latestYear?.active_campuses || 0;
+    }
+
+    // Line Chart - Trends
+    async function createTrendsChart() {
+      try {
+        console.log('Creating trends chart...');
+        const data = await fetchData('yearly-progress');
+        
+        if (!data || data.length === 0) {
+          console.error('No data received for trends chart');
+          return;
+        }
+
+        console.log('Chart data:', data);
+        
+        new Chart(document.getElementById('trendsChart'), {
+          type: 'line',
+          data: {
+            labels: data.map(item => item.created_year),
+            datasets: [{
+              label: 'Total Points',
+              data: data.map(item => item.total_points),
+              borderColor: '#800000',
+              backgroundColor: 'rgba(128, 0, 0, 0.15)',
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: false
+              },
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 12
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const yearData = data[context.dataIndex];
+                    return [
+                      `Total Points: ${yearData.total_points}`,
+                      `Total Projects: ${yearData.total_projects}`,
+                      `Active Campuses: ${yearData.active_campuses}`,
+                      `Total Participations: ${yearData.total_participations}`
+                    ];
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Total Points'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Year'
+                }
+              }
+            }
+          }
+        });
+        console.log('Trends chart created successfully');
+      } catch (error) {
+        console.error('Error creating trends chart:', error);
+      }
+    }
+
+    // Bar Chart - Campus Comparison
+    let campusChart = null;
+    let allCampusData = null;
+
+    async function createCampusChart() {
+      try {
+        console.log('Creating campus chart...');
+        const data = await fetchData('campus-stats');
+        
+        if (!data || data.length === 0) {
+          console.error('No data received for campus chart');
+          return;
+        }
+
+        allCampusData = data;
+        console.log('Raw campus data:', data);
+
+        // Get unique campuses
+        const uniqueCampuses = [...new Set(data.map(item => item.campus))];
+        uniqueCampuses.sort();
+        console.log('Unique campuses:', uniqueCampuses);
+
+        // Populate campus selector
+        const campusSelect = document.getElementById('campusSelect');
+        campusSelect.innerHTML = uniqueCampuses.map(campus => 
+          `<option value="${campus}">${formatCampusName(campus)}</option>`
+        ).join('');
+
+        // Add event listeners
+        document.getElementById('campusViewSelect').addEventListener('change', updateCampusChart);
+        campusSelect.addEventListener('change', updateCampusChart);
+        document.getElementById('resetCampusView').addEventListener('click', () => {
+          document.getElementById('campusViewSelect').value = 'all';
+          updateCampusChart();
+        });
+
+        // Initial chart creation
+        updateCampusChart();
+      } catch (error) {
+        console.error('Error creating campus chart:', error);
+      }
+    }
+
+    function formatCampusName(name) {
+      return name
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    function updateCampusChart() {
+      const viewType = document.getElementById('campusViewSelect').value;
+      const campusSelectorContainer = document.getElementById('campusSelectorContainer');
+      const chartDescription = document.getElementById('chartDescription');
+      
+      if (viewType === 'individual') {
+        campusSelectorContainer.style.display = 'block';
+        const selectedCampus = document.getElementById('campusSelect').value;
+        const campusData = allCampusData.filter(item => item.campus === selectedCampus);
+        createCampusChartView(campusData, true);
+        chartDescription.textContent = `SDG Performance for ${formatCampusName(selectedCampus)}`;
+      } else {
+        campusSelectorContainer.style.display = 'none';
+        
+        // Group data by campus
+        const campusGroups = {};
+        allCampusData.forEach(item => {
+          if (!campusGroups[item.campus]) {
+            campusGroups[item.campus] = {
+              total_points: 0,
+              participation_count: 0,
+              total_policy_research: 0,
+              sdg_count: 0
+            };
+          }
+          campusGroups[item.campus].total_points += Number(item.total_points) || 0;
+          campusGroups[item.campus].participation_count += Number(item.participation_count) || 0;
+          campusGroups[item.campus].total_policy_research += Number(item.total_policy_research) || 0;
+          campusGroups[item.campus].sdg_count += 1;
+        });
+
+        console.log('Campus groups:', campusGroups);
+
+        // Convert to array and calculate averages
+        const aggregatedData = Object.entries(campusGroups).map(([campus, data]) => ({
+          campus,
+          total_points: data.total_points,
+          average_points: Math.round((data.total_points / data.sdg_count) * 100) / 100,
+          participation_count: data.participation_count,
+          total_policy_research: data.total_policy_research,
+          sdg_count: data.sdg_count
+        }));
+
+        // Sort by total points
+        aggregatedData.sort((a, b) => b.total_points - a.total_points);
+
+        console.log('Aggregated Campus Data:', aggregatedData);
+
+        createCampusChartView(aggregatedData, false);
+        chartDescription.textContent = 'Total and Average Points by Campus';
+      }
+    }
+
+    function createCampusChartView(data, isIndividualView) {
+      if (campusChart) {
+        campusChart.destroy();
+      }
+
+      const ctx = document.getElementById('campusChart').getContext('2d');
+      console.log('Creating chart with data:', data);
+      
+      let chartData;
+      if (isIndividualView) {
+        chartData = {
+          labels: data.map(item => item.sdg_name),
+          datasets: [{
+            label: 'SDG Points',
+            data: data.map(item => Number(item.total_points) || 0),
+            backgroundColor: 'rgba(128, 0, 0, 0.7)',
+            borderColor: '#800000',
+            borderWidth: 1
+          }]
+        };
+      } else {
+        chartData = {
+          labels: data.map(item => formatCampusName(item.campus)),
+          datasets: [{
+            label: 'Total Points',
+            data: data.map(item => Number(item.total_points) || 0),
+            backgroundColor: 'rgba(128, 0, 0, 0.7)',
+            borderColor: '#800000',
+            borderWidth: 1
+          }]
+        };
+      }
+
+      console.log('Chart data:', chartData);
+
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: false
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                if (isIndividualView) {
+                  const item = data[context.dataIndex];
+                  return [
+                    `Points: ${item.total_points}`,
+                    `Participations: ${item.participation_count}`,
+                    `Research Projects: ${item.total_policy_research}`
+                  ];
+                } else {
+                  const item = data[context.dataIndex];
+                  return [
+                    `Total Points: ${item.total_points}`,
+                    `Number of SDGs: ${item.sdg_count}`,
+                    `Total Participations: ${item.participation_count}`,
+                    `Total Research Projects: ${item.total_policy_research}`
+                  ];
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Total Points'
+            },
+            grid: {
+              drawOnChartArea: true
+            }
+          },
+          x: {
+            title: {
+              display: isIndividualView,
+              text: isIndividualView ? 'SDG' : ''
+            },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45
+            }
+          }
+        },
+        barPercentage: 0.8,
+        categoryPercentage: 0.9
+      };
+
+      try {
+        campusChart = new Chart(ctx, {
+          type: 'bar',
+          data: chartData,
+          options: chartOptions
+        });
+        console.log('Chart created successfully');
+      } catch (error) {
+        console.error('Error creating chart:', error);
+      }
+    }
+
+    // Pie Chart - SDG Distribution
+    async function createDistributionChart() {
+      const data = await fetchData('distribution');
+      
+      // Use a palette of distinct colors for SDGs
+      const pieColors = [
+        '#800000', '#b71c1c', '#e53935', '#fbc02d', '#43a047', '#1e88e5', '#8e24aa', '#f57c00',
+        '#00897b', '#3949ab', '#c2185b', '#6d4c41', '#00acc1', '#7cb342', '#fbc02d', '#d81b60', '#5e35b1'
+      ];
+      new Chart(document.getElementById('distributionChart'), {
+        type: 'pie',
+        data: {
+          labels: data.map(item => item.sdg_name),
+          datasets: [{
+            data: data.map(item => item.total_points),
+            backgroundColor: data.map((_, i) => pieColors[i % pieColors.length])
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: false
+            },
+            legend: {
+              position: 'right',
+              labels: {
+                boxWidth: 12
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.raw / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.raw} points (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Radar Chart - Project Analysis
+    async function createRadarChart() {
+      const data = await fetchData('policy-research');
+      
+      new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+          labels: data.map(item => item.sdg_name),
+          datasets: [
+            {
+              label: 'Research Projects',
+              data: data.map(item => item.total_policy_research),
+              backgroundColor: 'rgba(128, 0, 0, 0.15)',
+              borderColor: '#800000',
+              pointBackgroundColor: '#800000',
+              borderWidth: 2
+            },
+            {
+              label: 'Points Earned',
+              data: data.map(item => item.avg_points),
+              backgroundColor: 'rgba(251, 140, 0, 0.15)', // orange
+              borderColor: '#fb8c00',
+              pointBackgroundColor: '#fb8c00',
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: false
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12
+              }
+            }
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Yearly Progress Chart
+    async function createYearlyProgressChart() {
+      const data = await fetchData('yearly-progress');
+      
+      new Chart(document.getElementById('yearlyProgressChart'), {
+        type: 'bar',
+        data: {
+          labels: data.map(item => item.created_year),
+          datasets: [{
+            label: 'Total Points',
+            data: data.map(item => item.total_points),
+            backgroundColor: 'rgba(128, 0, 0, 0.7)',
+            yAxisID: 'y'
+          }, {
+            label: 'Total Projects',
+            data: data.map(item => item.total_projects),
+            backgroundColor: 'rgba(183, 28, 28, 0.5)',
+            yAxisID: 'y1'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Yearly Progress Overview'
+            }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Total Points'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Total Projects'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Project Details Table
+    let allProjectDetails = [];
+    async function updateProjectDetailsTable() {
+      const data = await fetchData('project-details');
+      allProjectDetails = data;
+      populateProjectFilters(data);
+      renderProjectDetailsTable(data);
+    }
+
+    function populateProjectFilters(data) {
+      // Populate Campus Filter
+      const campusSet = new Set(data.map(item => item.campus));
+      const campusFilter = document.getElementById('campusFilter');
+      campusFilter.innerHTML = '<option value="">All Campuses</option>' +
+        Array.from(campusSet).sort().map(campus => `<option value="${campus}">${campus}</option>`).join('');
+      // Populate SDG Filter
+      const sdgSet = new Set(data.map(item => item.sdg_name));
+      const sdgFilter = document.getElementById('sdgFilter');
+      sdgFilter.innerHTML = '<option value="">All SDGs</option>' +
+        Array.from(sdgSet).sort().map(sdg => `<option value="${sdg}">${sdg}</option>`).join('');
+    }
+
+    function renderProjectDetailsTable(data) {
+      const tableBody = document.getElementById('projectDetailsTable');
+      tableBody.innerHTML = '';
+      data.forEach(project => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${project.title_ppa}</td>
+          <td>${project.description}</td>
+          <td>${project.total_cost}</td>
+          <td>${project.fund_source}</td>
+          <td>${project.campus}</td>
+          <td>${project.sdg_name}</td>
+          <td>${project.total_points}</td>
+          <td>${project.created_year}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function filterProjectDetailsTable() {
+      const search = document.getElementById('projectSearch').value.toLowerCase();
+      const campus = document.getElementById('campusFilter').value;
+      const sdg = document.getElementById('sdgFilter').value;
+      let filtered = allProjectDetails;
+      if (campus) {
+        filtered = filtered.filter(item => item.campus === campus);
+      }
+      if (sdg) {
+        filtered = filtered.filter(item => item.sdg_name === sdg);
+      }
+      if (search) {
+        filtered = filtered.filter(item =>
+          (item.title_ppa && item.title_ppa.toLowerCase().includes(search)) ||
+          (item.description && item.description.toLowerCase().includes(search)) ||
+          (item.fund_source && item.fund_source.toLowerCase().includes(search)) ||
+          (item.campus && item.campus.toLowerCase().includes(search)) ||
+          (item.sdg_name && item.sdg_name.toLowerCase().includes(search)) ||
+          (item.total_cost && String(item.total_cost).toLowerCase().includes(search)) ||
+          (item.total_points && String(item.total_points).toLowerCase().includes(search)) ||
+          (item.created_year && String(item.created_year).toLowerCase().includes(search))
+        );
+      }
+      renderProjectDetailsTable(filtered);
+    }
+
+    // Initialize all charts and data when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSummaryCards();
+      createTrendsChart();
+      createCampusChart();
+      createDistributionChart();
+      createRadarChart();
+      createYearlyProgressChart();
+      updateProjectDetailsTable();
+      // Search and filter listeners
+      setTimeout(() => {
+        document.getElementById('projectSearch').addEventListener('input', filterProjectDetailsTable);
+        document.getElementById('campusFilter').addEventListener('change', filterProjectDetailsTable);
+        document.getElementById('sdgFilter').addEventListener('change', filterProjectDetailsTable);
+      }, 500);
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
